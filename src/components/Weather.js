@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import FiveDayForecast from './FiveDayForecast'
 
 const Weather = (props) => {
 
@@ -25,6 +26,9 @@ const Weather = (props) => {
         max: Math.max(...temps.map(item => item.max))
       }
       days.push(dayForecast)
+    }
+    while(days.length > 5){
+      days.pop()
     }
     setForecasts(days)
   }
@@ -65,14 +69,11 @@ const Weather = (props) => {
           </div>
         </div>
       </div>
-      <div className='row pt-5'>
+      <h3 className='pt-5 text-center title-container_weather'>5 Day Forecast</h3>
+      <div className='row pt-5 justify-content-center'>
           {forecasts &&
             forecasts.map((item, index) => 
-              <div className='pl-3' key={index}>
-                <p className='weather__key'>{item.date}</p>
-                <p className="weather__value">High: {item.min}</p>
-                <p className="weather__value">Low: {item.max}</p>
-              </div>
+              <FiveDayForecast date={item.date} min={item.min} max={item.max} key={index}/>
               )
           }
       </div>
