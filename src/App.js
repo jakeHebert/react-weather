@@ -13,7 +13,9 @@ export default class App extends Component {
     country: undefined,
     humidity: undefined,
     description: undefined,
-    error: undefined
+    error: undefined,
+    forecast: undefined,
+    weatherQueried: false
   }
 
   getWeather = async (e) => {
@@ -24,8 +26,9 @@ export default class App extends Component {
     console.log(city, country)
     const api_call = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=imperial`)   
     const data = await api_call.json()
-    
+  
     if (city && country){
+      const fiveDayForecast = await this.get5DayForecast(city, country)
       console.log(data)
 
       this.setState({
@@ -34,13 +37,21 @@ export default class App extends Component {
         country: data.sys.country,
         humidity: data.main.humidity,
         description: data.weather[0].description,
-        error: ""
+        error: "",
+        forecast: fiveDayForecast,
+        weatherQueried: true
       })
     }else{
       this.setState({
         error: "Please enter valid values"
     })
   }}
+
+  get5DayForecast = async (city, country) => {
+    const api_call2 = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city},${country}&appid=${API_KEY}&units=imperial`)
+    const data = await api_call2.json()
+    return data
+  }
 
   render() {
     return (
@@ -52,6 +63,7 @@ export default class App extends Component {
                 </div>
                 <div className='col-xs-7 col-lg-7 form-container'>
                   <Form getWeather={this.getWeather}/>
+                  {this.state.weatherQueried &&
                   <Weather 
                     temperature={this.state.temperature}
                     city={this.state.city}
@@ -59,7 +71,9 @@ export default class App extends Component {
                     humidity={this.state.humidity}
                     description={this.state.description}
                     error={this.state.error}
+                    forecast={this.state.forecast}
                   />
+                  }
                 </div>
             </div>
           </div>
